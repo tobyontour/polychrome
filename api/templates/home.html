@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Home</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 40rem; margin: 2rem auto; padding: 0 1rem; }
+    nav { margin-bottom: 1.5rem; }
+    a { color: #2563eb; }
+  </style>
+</head>
+<body>
+  <nav>
+    {% if user %}
+      <span>Signed in as <strong>{{ user }}</strong></span>
+      &middot; <a href="/logout">Log out</a>
+    {% else %}
+      <a href="/login">Log in</a>
+    {% endif %}
+  </nav>
+  <h1>polychrome</h1>
+  <p>JWT session is stored in an HTTP-only cookie. Use <code>GET /api/me</code> while logged in to verify the token.</p>
+</body>
+</html>

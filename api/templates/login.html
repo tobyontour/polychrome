@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Log in</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 22rem; margin: 2rem auto; padding: 0 1rem; }
+    label { display: block; margin-top: 1rem; font-weight: 600; }
+    input { width: 100%; padding: 0.5rem; margin-top: 0.25rem; box-sizing: border-box; }
+    button { margin-top: 1.25rem; padding: 0.5rem 1rem; cursor: pointer; }
+    .error { color: #b91c1c; margin-top: 1rem; }
+    a { color: #2563eb; }
+  </style>
+</head>
+<body>
+  <h1>Log in</h1>
+  <form method="post" action="/login" autocomplete="on">
+    <label for="username">Username</label>
+    <input id="username" name="username" type="text" required autocomplete="username">
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" required autocomplete="current-password">
+    <button type="submit">Sign in</button>
+  </form>
+  {% if error %}
+    <p class="error">Invalid username or password.</p>
+  {% endif %}
+  <p><a href="/">Back to home</a></p>
+</body>
+</html>

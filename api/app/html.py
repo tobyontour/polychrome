@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Form, Request, status
+from fastapi import APIRouter, Form, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
@@ -7,11 +7,12 @@ from pathlib import Path
 from .auth import (
     COOKIE_NAME,
     create_access_token,
-    get_current_user,
     get_optional_user,
+    get_token_from_request,
     verify_credentials,
 )
 from .config import ACCESS_TOKEN_EXPIRE_MINUTES, COOKIE_SECURE
+from .login_tracker import login_tracker
 
 BASE_DIR = Path(__file__).resolve().parent
 templates = Jinja2Templates(directory=BASE_DIR / "../templates")
@@ -67,6 +68,7 @@ async def login_submit(
             status_code=status.HTTP_303_SEE_OTHER,
         )
     token = create_access_token(username)
+    login_tracker.record_login(username, token)
     response = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     _set_auth_cookie(response, token)
     return response
@@ -74,6 +76,9 @@ async def login_submit(
 
 @router.get("/logout", response_class=HTMLResponse)
 async def logout_get(request: Request) -> HTMLResponse:
+    token = get_token_from_request(request)
+    if token:
+        login_tracker.record_logout(token)
     response = templates.TemplateResponse(
         request,
         name="logout.html",
@@ -84,12 +89,10 @@ async def logout_get(request: Request) -> HTMLResponse:
 
 
 @router.post("/logout")
-async def logout_post() -> RedirectResponse:
+async def logout_post(request: Request) -> RedirectResponse:
+    token = get_token_from_request(request)
+    if token:
+        login_tracker.record_logout(token)
     response = RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
     _clear_auth_cookie(response)
     return response
-
-
-@router.get("/api/me")
-async def api_me(username: str = Depends(get_current_user)) -> dict[str, str]:
-    return {"username": username}

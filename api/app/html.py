@@ -4,9 +4,6 @@ from fastapi.templating import Jinja2Templates
 
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parent
-templates = Jinja2Templates(directory=BASE_DIR / "../templates")
-
 from .auth import (
     COOKIE_NAME,
     create_access_token,
@@ -16,6 +13,8 @@ from .auth import (
 )
 from .config import ACCESS_TOKEN_EXPIRE_MINUTES, COOKIE_SECURE
 
+BASE_DIR = Path(__file__).resolve().parent
+templates = Jinja2Templates(directory=BASE_DIR / "../templates")
 router = APIRouter()
 
 def _set_auth_cookie(response: RedirectResponse, token: str) -> None:

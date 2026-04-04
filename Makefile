@@ -15,6 +15,9 @@ fix:
 test: install-dev
 	uv run pytest
 
+coverage: install-dev
+	uv run pytest --cov=api api/tests
+
 run:
 	uv run uvicorn api.app.main:app --reload
 

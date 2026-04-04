@@ -1,5 +1,7 @@
 import os
 import secrets
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
 
 # Override in production via environment.
 SECRET_KEY = os.environ.get("JWT_SECRET_KEY", secrets.token_urlsafe(32))
@@ -11,3 +13,10 @@ AUTH_PASSWORD = os.environ.get("AUTH_PASSWORD", "changeme")
 
 # Set true behind HTTPS in production.
 COOKIE_SECURE = os.environ.get("COOKIE_SECURE", "").lower() in ("1", "true", "yes")
+
+DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///users.db")
+
+engine = create_engine(DATABASE_URL)
+
+def get_session() -> Session:
+    return Session(bind=engine)

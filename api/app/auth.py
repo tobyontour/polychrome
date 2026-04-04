@@ -3,10 +3,17 @@ from datetime import UTC, datetime, timedelta
 
 from fastapi import HTTPException, Request, status
 from jose import JWTError, jwt
-
+from pwdlib import PasswordHash
 from .config import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, AUTH_PASSWORD, AUTH_USERNAME, SECRET_KEY
 
 COOKIE_NAME = "access_token"
+password_hash = PasswordHash.recommended()
+
+def verify_password(plain_password, hashed_password):
+    return password_hash.verify(plain_password, hashed_password)
+
+def get_password_hash(password):
+    return password_hash.hash(password)
 
 
 def verify_credentials(username: str, password: str) -> bool:

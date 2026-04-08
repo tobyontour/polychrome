@@ -91,3 +91,14 @@ def test_home_shows_user_when_logged_in(client: TestClient) -> None:
     response = client.get("/")
     assert response.status_code == 200
     assert "testuser" in response.text
+
+
+def test_api_token_route_available_from_main_app(client: TestClient) -> None:
+    response = client.post(
+        "/api/token",
+        data={"username": "testuser", "password": "testpass"},
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["token_type"] == "bearer"
+    assert isinstance(body["access_token"], str)

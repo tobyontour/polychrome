@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Form, Request, status
+from fastapi import APIRouter, Form, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
@@ -7,7 +7,6 @@ from pathlib import Path
 from .auth import (
     COOKIE_NAME,
     create_access_token,
-    get_current_user,
     get_optional_user,
     verify_credentials,
 )
@@ -88,8 +87,3 @@ async def logout_post() -> RedirectResponse:
     response = RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
     _clear_auth_cookie(response)
     return response
-
-
-@router.get("/api/me")
-async def api_me(username: str = Depends(get_current_user)) -> dict[str, str]:
-    return {"username": username}

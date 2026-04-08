@@ -92,3 +92,39 @@ def test_me_accepts_access_token_cookie(api_client: TestClient) -> None:
     me = api_client.get("/api/me")
     assert me.status_code == 200
     assert me.json() == {"username": "testuser"}
+
+
+def test_logged_in_users_requires_authentication(api_client: TestClient) -> None:
+    response = api_client.get("/api/logged-in-users")
+    assert response.status_code == 401
+
+
+def test_logged_in_users_includes_token_user(api_client: TestClient) -> None:
+    token_response = api_client.post(
+        "/api/token",
+        data={"username": "testuser", "password": "testpass"},
+    )
+    token = token_response.json()["access_token"]
+    response = api_client.get(
+        "/api/logged-in-users",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 200
+    assert response.json() == {"users": ["testuser"]}
+
+
+def test_logged_in_users_deduplicates_multiple_tokens(api_client: TestClient) -> None:
+    api_client.post(
+        "/api/token",
+        data={"username": "testuser", "password": "testpass"},
+    )
+    second = api_client.post(
+        "/api/token",
+        data={"username": "testuser", "password": "testpass"},
+    ).json()["access_token"]
+    response = api_client.get(
+        "/api/logged-in-users",
+        headers={"Authorization": f"Bearer {second}"},
+    )
+    assert response.status_code == 200
+    assert response.json() == {"users": ["testuser"]}

@@ -11,5 +11,6 @@ static_files = StaticFiles(directory=BASE_DIR / "../static", check_dir=False)
 
 app = FastAPI(title="polychrome api", version="0.1.0")
 app.mount("/static", static_files, name="static")
+app.include_router(api_router)
 app.include_router(html_router)
 app.include_router(api_router)

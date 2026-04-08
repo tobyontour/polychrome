@@ -9,9 +9,17 @@ os.environ["COOKIE_SECURE"] = "false"
 import pytest
 from fastapi.testclient import TestClient
 
+from api.app.login_tracker import login_tracker
 from api.app.main import app
 
 
 @pytest.fixture
 def client() -> TestClient:
     return TestClient(app)
+
+
+@pytest.fixture(autouse=True)
+def clear_login_tracker() -> None:
+    login_tracker.clear()
+    yield
+    login_tracker.clear()

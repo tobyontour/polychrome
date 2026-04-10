@@ -1,5 +1,4 @@
-
-from ..models.user import User
+from ..models.user import User, SecretStr
 from sqlalchemy import Integer, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Mapped, mapped_column
@@ -32,7 +31,7 @@ class UserRepository:
         user = self.get_user(username)
         if user is None:
             return None
-        return user.password
+        return user.password.get_secret_value()
 
 class SqlUser(Base):
     __tablename__ = "users"
@@ -46,14 +45,14 @@ class SqlUser(Base):
     def to_model(self) -> User:
         return User(
             username=self.username,
-            password=self.password,
+            password=SecretStr(self.password),
             email=self.email,
             created_at=self.created_at,
             updated_at=self.updated_at)
 
     def from_model(self, user: User) -> None:
         self.username = user.username
-        self.password = user.password
+        self.password = user.password.get_secret_value()
         self.email = user.email
         self.created_at = user.created_at
         self.updated_at = user.updated_at

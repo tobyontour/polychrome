@@ -1,4 +1,4 @@
-.PHONY: run install install-dev lint fix test migrate migrate-down migrate-create
+.PHONY: run install install-dev lint fix test migrate migrate-down migrate-create cli
 
 install:
 	uv sync
@@ -20,6 +20,9 @@ coverage: install-dev
 
 run:
 	uv run uvicorn api.app.main:app --reload
+
+cli:
+	uv run python -m cli
 
 migrate:
 	uv run alembic upgrade head

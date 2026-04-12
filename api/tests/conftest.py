@@ -11,6 +11,7 @@ from fastapi.testclient import TestClient
 
 from api.app.login_tracker import login_tracker
 from api.app.main import app
+from api.app.vouch_tracker import vouch_tracker
 
 
 @pytest.fixture
@@ -21,5 +22,7 @@ def client() -> TestClient:
 @pytest.fixture(autouse=True)
 def clear_login_tracker() -> None:
     login_tracker.clear()
+    vouch_tracker.clear()
     yield
     login_tracker.clear()
+    vouch_tracker.clear()

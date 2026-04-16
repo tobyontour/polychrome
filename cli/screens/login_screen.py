@@ -27,11 +27,21 @@ class LoginScreen(Screen):
               |___/
 """
 
+    def __init__(
+        self,
+        name: str | None = None,
+        id: str | None = None,
+        classes: str | None = None,
+        api_url: str | None = None
+    ) -> None:
+        super().__init__(name=name, id=id, classes=classes)
+        self._api_url = api_url
+
     def compose(self) -> ComposeResult:
         """Compose the screen."""
         yield Header()
         yield Static(self.LOGO, id="logo", markup=False)
-        yield Input(placeholder="API base URL", value="http://127.0.0.1:8000", id="api-url")
+        yield Input(placeholder="API base URL", value=self._api_url or "http://127.0.0.1:8000", id="api-url")
         yield Input(placeholder="Username", id="username")
         yield Input(placeholder="Password", password=True, id="password")
         yield Button("Login", variant="primary", id="login")
@@ -139,4 +149,4 @@ class LoginScreen(Screen):
             if not isinstance(me_payload, dict) or not isinstance(me_payload.get("username"), str):
                 raise ValueError("Unexpected /api/me response payload.")
 
-        return LoginResult(username=me_payload["username"], token=access_token)
+        return LoginResult(username=me_payload["username"], token=access_token, api_url=api_url)

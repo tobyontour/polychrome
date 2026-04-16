@@ -7,12 +7,12 @@ class MenuItem(BaseModel):
     key: str
     item_type: str
     last_change: datetime | None = None
-    owner: str | None = None
+    owner: str
 
 class Menu(BaseModel):
     title: str
-    owner: str | None = None
+    owner: str
     keypath: str
-    items: list[MenuItem]
+    items: list[MenuItem] = []
     header: str
     access_groups: list[str] | None = None

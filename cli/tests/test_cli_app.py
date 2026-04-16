@@ -7,8 +7,7 @@ import asyncio
 import httpx
 import pytest
 
-from cli.app import ApiLoginApp
-
+from cli.screens.login_screen import LoginScreen
 
 class FakeAsyncClient:
     """Small async client shim for deterministic HTTP responses."""
@@ -60,10 +59,10 @@ def test_authenticate_success(monkeypatch: pytest.MonkeyPatch) -> None:
         {"username": "testuser"},
     )
     fake_client = FakeAsyncClient(token_response, me_response)
-    monkeypatch.setattr("cli.app.httpx.AsyncClient", lambda **_: fake_client)
+    monkeypatch.setattr("httpx.AsyncClient", lambda **_: fake_client)
 
-    app = ApiLoginApp()
-    result = asyncio.run(app._authenticate("http://example.local", "testuser", "testpass"))
+    login_screen = LoginScreen()
+    result = asyncio.run(login_screen._authenticate("http://example.local", "testuser", "testpass"))
 
     assert result.username == "testuser"
     assert result.token == "token-123"
@@ -87,11 +86,11 @@ def test_authenticate_rejects_non_bearer(monkeypatch: pytest.MonkeyPatch) -> Non
         {"username": "testuser"},
     )
     fake_client = FakeAsyncClient(token_response, me_response)
-    monkeypatch.setattr("cli.app.httpx.AsyncClient", lambda **_: fake_client)
+    monkeypatch.setattr("httpx.AsyncClient", lambda **_: fake_client)
 
-    app = ApiLoginApp()
+    login_screen = LoginScreen()
     with pytest.raises(ValueError, match="Unsupported token type"):
-        asyncio.run(app._authenticate("http://example.local", "testuser", "testpass"))
+        asyncio.run(login_screen._authenticate("http://example.local", "testuser", "testpass"))
 
 
 def test_authenticate_rejects_missing_username_payload(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -108,8 +107,8 @@ def test_authenticate_rejects_missing_username_payload(monkeypatch: pytest.Monke
         {"name": "testuser"},
     )
     fake_client = FakeAsyncClient(token_response, me_response)
-    monkeypatch.setattr("cli.app.httpx.AsyncClient", lambda **_: fake_client)
+    monkeypatch.setattr("httpx.AsyncClient", lambda **_: fake_client)
 
-    app = ApiLoginApp()
+    login_screen = LoginScreen()
     with pytest.raises(ValueError, match="Unexpected /api/me response payload"):
-        asyncio.run(app._authenticate("http://example.local", "testuser", "testpass"))
+        asyncio.run(login_screen._authenticate("http://example.local", "testuser", "testpass"))

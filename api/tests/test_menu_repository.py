@@ -1,10 +1,10 @@
 from datetime import datetime
-
+import pytest
 from api.app.models.menu import Menu, MenuItem
 from api.app.repositories.menu import FileSystemMenuRepository, MenuRepository
 
 
-def _menu(keypath: str = "menu.json", title: str = "Main Menu") -> Menu:
+def _menu(keypath: str = "m", title: str = "Main Menu") -> Menu:
     return Menu(
         title=title,
         owner="toby",
@@ -15,7 +15,7 @@ def _menu(keypath: str = "menu.json", title: str = "Main Menu") -> Menu:
     )
 
 
-def _menu_item(key: str = "settings", title: str = "Settings") -> MenuItem:
+def _menu_item(key: str = "i", title: str = "Settings") -> MenuItem:
     return MenuItem(
         title=title,
         key=key,
@@ -67,7 +67,7 @@ def test_filesystem_menu_repository_round_trip_menu(tmp_path) -> None:
     menu = _menu()
 
     repo.create_menu(menu)
-    assert (tmp_path / menu.keypath).exists()
+    assert (tmp_path / "index.json").exists()
     assert repo.get_menu(menu.keypath) == menu
 
     updated = _menu(title="Updated")
@@ -81,25 +81,28 @@ def test_filesystem_menu_repository_round_trip_menu(tmp_path) -> None:
 def test_filesystem_menu_repository_missing_menu_items_returns_empty(tmp_path) -> None:
     repo = FileSystemMenuRepository(str(tmp_path))
 
-    assert repo.get_menu_items("does-not-exist.json") == []
+    with pytest.raises(ValueError):
+        repo.get_menu_items("x")
 
 
 def test_filesystem_menu_repository_menu_item_file_crud(tmp_path) -> None:
     repo = FileSystemMenuRepository(str(tmp_path))
-    menu = _menu(keypath="menu-items")
+    menu = _menu(keypath="m")
     item = _menu_item()
     item.last_change = None
-    item_path = tmp_path / menu.keypath / item.key
-    item_path.parent.mkdir(parents=True, exist_ok=True)
+
+    repo.create_menu(menu)
 
     repo.create_menu_item(menu, item)
-    assert item_path.exists()
-    assert item_path.read_text() != ""
+    returned_item = repo.get_menu_items(menu.keypath)
+    assert returned_item[0].key == item.key
 
     item.title = "Updated Settings"
     repo.update_menu_item(menu, item)
-    assert item_path.exists()
-    assert item_path.read_text() != ""
+    returned_item = repo.get_menu_items(menu.keypath)
+    assert returned_item[0].key == item.key
+    assert returned_item[0].title == item.title
 
     repo.delete_menu_item(menu, item)
-    assert not item_path.exists()
+    returned_items = repo.get_menu_items(menu.keypath)
+    assert len(returned_items) == 0

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import sys
+import asyncio
 from textual.app import App
 
 from cli import LoginResult
@@ -52,13 +53,15 @@ class PolychromeCLIApp(App[None]):
 
     BINDINGS = [("q", "quit", "Quit")]
     _api: PolychromeAPI | None = None
-    def on_mount(self) -> None:
+    async def on_mount(self) -> None:
         """Handle mount event."""
 
-        def check_logged_in(result: LoginResult | None) -> None:
+        async def check_logged_in(result: LoginResult | None) -> None:
             if result:
                 self._api = PolychromeAPI(result.api_url, result.token)
-                self.push_screen(MenuScreen())
+
+                menu = await self._api.get_menu("_")
+                self.push_screen(MenuScreen(menu=menu))
             else:
                 sys.exit(1)
 

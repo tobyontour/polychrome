@@ -1,6 +1,6 @@
 import httpx
 from api.app.models.menu import Menu
-
+from api.app.models.commentfile import CommentFile
 class PolychromeAPI:
     def __init__(self, base_url: str, token: str):
         self.base_url = base_url
@@ -12,6 +12,13 @@ class PolychromeAPI:
         return response.json()["username"]
 
     async def get_menu(self, keypath: str) -> Menu:
+        if keypath != "_":
+            keypath = keypath.lstrip("_")
         response = await self.client.get(f"/api/menu/{keypath}")
         response.raise_for_status()
         return Menu.model_validate(response.json())
+
+    async def get_comment_file(self, keypath: str) -> CommentFile:
+        response = await self.client.get(f"/api/commentfile/{keypath}")
+        response.raise_for_status()
+        return CommentFile.model_validate(response.json())

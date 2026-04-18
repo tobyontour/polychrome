@@ -22,7 +22,7 @@ run:
 	uv run uvicorn api.app.main:app --reload
 
 cli:
-	uv run python -m cli
+	uv run textual run cli.app:main --dev
 
 migrate:
 	uv run alembic upgrade head

@@ -21,6 +21,7 @@ dev = [
     "pytest>=8.0",
     "pytest-cov>=7.1.0",
     "ruff>=0.15.9",
+    "textual-dev",
 ]
 
 [tool.pytest.ini_options]

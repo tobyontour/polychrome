@@ -1,0 +1,52 @@
+Screen {
+  align: center middle;
+}
+
+#form {
+  width: 70;
+  max-width: 90;
+  padding: 1 2;
+  border: round $accent;
+}
+
+#title {
+  text-style: bold;
+  margin-bottom: 1;
+}
+
+Input {
+  margin: 0 0 1 0;
+}
+
+#actions {
+  margin: 0 0 1 0;
+  align: right middle;
+}
+
+#status {
+  color: $text-muted;
+}
+
+#status.success {
+  color: $success;
+}
+
+#status.error {
+  color: $error;
+}
+
+#login-screen {
+  align: center middle;
+
+  #form {
+    height: 33;
+    width: 63;
+    background: blue 50%;
+    border: wide white;
+  }
+
+  #username, #password, #api-url, #login {
+    width: 40;
+    margin: 0 0 1 8;
+  }
+}

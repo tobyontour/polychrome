@@ -5,6 +5,7 @@ from textual import on
 from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.widgets import Button, Footer, Header, Input, Static
+from textual.containers import Vertical
 
 from cli import LoginResult
 
@@ -13,11 +14,7 @@ class LoginScreen(Screen):
     _login_result: LoginResult | None = None
     _remaining_attempts: int = 3
 
-    CSS = """
-    #logo {
-    }
-    """
-
+    AUTO_FOCUS = "#username"
     LOGO = r"""
  ____       _            _
 |  _ \ ___ | |_   _  ___| |__  _ __ ___  _ __ ___   ___
@@ -30,7 +27,7 @@ class LoginScreen(Screen):
     def __init__(
         self,
         name: str | None = None,
-        id: str | None = None,
+        id: str | None = "login-screen",
         classes: str | None = None,
         api_url: str | None = None
     ) -> None:
@@ -40,12 +37,15 @@ class LoginScreen(Screen):
     def compose(self) -> ComposeResult:
         """Compose the screen."""
         yield Header()
-        yield Static(self.LOGO, id="logo", markup=False)
-        yield Input(placeholder="API base URL", value=self._api_url or "http://127.0.0.1:8000", id="api-url")
-        yield Input(placeholder="Username", id="username")
-        yield Input(placeholder="Password", password=True, id="password")
-        yield Button("Login", variant="primary", id="login")
-        yield Static("Enter credentials and press Login.", id="status")
+        yield Vertical(
+            Static(self.LOGO, id="logo", markup=False),
+            Input(placeholder="API base URL", value=self._api_url or "http://127.0.0.1:8000", id="api-url"),
+            Input(placeholder="Username", id="username", max_length=40),
+            Input(placeholder="Password", password=True, id="password", max_length=40),
+            Button("Login", variant="primary", id="login"),
+            Static("Enter credentials and press Login.", id="status"),
+            id="form",
+        )
         yield Footer()
 
     @on(Button.Pressed, "#login")

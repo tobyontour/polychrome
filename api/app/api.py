@@ -6,6 +6,8 @@ from .auth import get_current_user, verify_credentials, create_access_token
 from .login_tracker import login_tracker
 from .repositories.menu import FileSystemMenuRepository, MenuRepository
 from .models.menu import Menu
+from .repositories.commentfile import CommentRepository
+from .models.commentfile import CommentFile, Post
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/token")
 
@@ -26,6 +28,9 @@ class LoggedInUsers(BaseModel):
 
 def get_menu_repository() -> MenuRepository:
     return FileSystemMenuRepository(base_path="data/menus")
+
+def get_comment_repository() -> CommentRepository:
+    return CommentRepository()
 
 @router.get("/api/me")
 async def api_me(username: str = Depends(get_current_user)) -> TokenData:
@@ -58,3 +63,17 @@ async def api_menu(keypath: str, username: str = Depends(get_current_user), menu
 # @router.put("/api/menus/{keypath}")
 # async def api_update_menu(keypath: str, menu: Menu, username: str = Depends(get_current_user), menu_repository: MenuRepository = Depends(get_menu_repository)) -> Menu:
 #     return menu_repository.update_menu(menu)
+
+@router.get("/api/commentfile/{keypath}")
+async def api_comment_file(keypath: str, username: str = Depends(get_current_user), comment_repository: CommentRepository = Depends(get_comment_repository)) -> CommentFile:
+    comment = comment_repository.get_comment_file(keypath)
+    if comment is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Comment file not found")
+    return comment
+
+@router.get("/api/commentfile/{keypath}/posts")
+async def api_comment_file_posts(keypath: str, start_index: int = 0, length: int | None = None, username: str = Depends(get_current_user), comment_repository: CommentRepository = Depends(get_comment_repository)) -> list[Post]:
+    comment = comment_repository.get_comment_file(keypath)
+    if comment is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Comment file not found")
+    return list(comment.read(start_index, length))

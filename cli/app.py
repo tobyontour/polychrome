@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import sys
-import asyncio
 from textual.app import App
 
 from cli import LoginResult
@@ -12,44 +11,7 @@ from cli.screens import LoginScreen, MenuScreen
 from cli.api import PolychromeAPI
 class PolychromeCLIApp(App[None]):
     TITLE = "Polychrome"
-    CSS = """
-    Screen {
-        align: center middle;
-    }
-
-    #form {
-        width: 70;
-        max-width: 90;
-        padding: 1 2;
-        border: round $accent;
-    }
-
-    #title {
-        text-style: bold;
-        margin-bottom: 1;
-    }
-
-    Input {
-        margin: 0 0 1 0;
-    }
-
-    #actions {
-        margin: 0 0 1 0;
-        align: right middle;
-    }
-
-    #status {
-        color: $text-muted;
-    }
-
-    #status.success {
-        color: $success;
-    }
-
-    #status.error {
-        color: $error;
-    }
-    """
+    CSS_PATH = "css/main.tcss"
 
     BINDINGS = [("q", "quit", "Quit")]
     _api: PolychromeAPI | None = None
@@ -61,7 +23,7 @@ class PolychromeCLIApp(App[None]):
                 self._api = PolychromeAPI(result.api_url, result.token)
 
                 menu = await self._api.get_menu("_")
-                self.push_screen(MenuScreen(menu=menu))
+                self.push_screen(MenuScreen(menu=menu, api=self._api))
             else:
                 sys.exit(1)
 

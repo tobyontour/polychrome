@@ -158,7 +158,7 @@ class SqlPoll(PollBase):
             options=[option.to_model() for option in self.options],
         )
 
-    def from_model(self, poll: Poll) -> None:
+    def from_model(self, poll: Poll, *, include_options: bool = True) -> None:
         self.id = poll.id
         self.owner = poll.owner
         self.title = poll.title
@@ -166,10 +166,11 @@ class SqlPoll(PollBase):
         self.is_anonymous = poll.is_anonymous
         self.closes_at = poll.closes_at
         self.created_at = poll.created_at
-        self.options = [
-            SqlPollOption.from_model(self.id, option, position)
-            for position, option in enumerate(poll.options)
-        ]
+        if include_options:
+            self.options = [
+                SqlPollOption.from_model(self.id, option, position)
+                for position, option in enumerate(poll.options)
+            ]
 
 
 class SqlPollOption(PollBase):
@@ -255,7 +256,14 @@ class SqlAlchemyPollRepository:
             sql_poll = session.query(SqlPoll).filter(SqlPoll.id == poll.id).first()
             if sql_poll is None:
                 raise ValueError(f"Poll not found: {poll.id}")
-            sql_poll.from_model(poll)
+            sql_poll.from_model(poll, include_options=False)
+            # Remove existing options first so unique (poll_id, option_id) remains valid.
+            sql_poll.options.clear()
+            session.flush()
+            sql_poll.options = [
+                SqlPollOption.from_model(sql_poll.id, option, position)
+                for position, option in enumerate(poll.options)
+            ]
             session.commit()
 
     def delete_poll(self, poll_id: str) -> None:

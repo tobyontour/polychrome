@@ -1,5 +1,5 @@
 Screen {
-  align: center middle;
+  align: center top;
 }
 
 #form {
@@ -33,6 +33,12 @@ Input {
 
 #status.error {
   color: $error;
+}
+
+#sidebar {
+  background: blue 50%;
+  border: wide white;
+  max-width: 20;
 }
 
 #login-screen {

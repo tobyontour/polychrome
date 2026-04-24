@@ -23,6 +23,8 @@ class PolychromeCLIApp(App[None]):
                 self._api = PolychromeAPI(result.api_url, result.token)
 
                 menu = await self._api.get_menu("_")
+                if menu is None:
+                    raise ValueError("Menu not found")
                 self.push_screen(MenuScreen(menu=menu, api=self._api))
             else:
                 sys.exit(1)

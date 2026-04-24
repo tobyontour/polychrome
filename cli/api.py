@@ -11,14 +11,24 @@ class PolychromeAPI:
         response = await self.client.get("/api/me")
         return response.json()["username"]
 
-    async def get_menu(self, keypath: str) -> Menu:
+    async def get_menu(self, keypath: str) -> Menu | None:
         if keypath != "_":
             keypath = keypath.lstrip("_")
-        response = await self.client.get(f"/api/menu/{keypath}")
-        response.raise_for_status()
-        return Menu.model_validate(response.json())
+        try:
+            response = await self.client.get(f"/api/menu/{keypath}")
+            response.raise_for_status()
+            return Menu.model_validate(response.json())
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == 404:
+                return None
+            raise e
 
-    async def get_comment_file(self, keypath: str) -> CommentFile:
-        response = await self.client.get(f"/api/commentfile/{keypath}")
-        response.raise_for_status()
-        return CommentFile.model_validate(response.json())
+    async def get_comment_file(self, keypath: str) -> CommentFile | None:
+        try:
+            response = await self.client.get(f"/api/commentfile/{keypath}")
+            response.raise_for_status()
+            return CommentFile.model_validate(response.json())
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == 404:
+                return None
+            raise e

@@ -8,7 +8,7 @@ KEYPATH = Annotated[str, StringConstraints(to_lower=True, pattern=KEYPATH_PATTER
 class MenuItem(BaseModel):
     title: str
     key: Annotated[str, StringConstraints(to_lower=True, pattern=KEYPATH_PATTERN, min_length=1, max_length=1)]
-    keypath: KEYPATH | None = None
+    keypath: KEYPATH
     item_type: str
     last_change: datetime | None = None
     owner: str | None = None

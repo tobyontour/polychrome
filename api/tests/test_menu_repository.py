@@ -15,10 +15,11 @@ def _menu(keypath: str = "m", title: str = "Main Menu") -> Menu:
     )
 
 
-def _menu_item(key: str = "i", title: str = "Settings") -> MenuItem:
+def _menu_item(key: str = "i", title: str = "Settings", keypath: str = "mi") -> MenuItem:
     return MenuItem(
         title=title,
         key=key,
+        keypath=keypath,
         item_type="submenu",
         last_change=datetime(2026, 1, 1),
         owner="toby",

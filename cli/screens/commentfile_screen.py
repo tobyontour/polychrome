@@ -1,5 +1,6 @@
 from textual.app import ComposeResult
 from textual.screen import Screen
+from textual import events
 from textual.widgets import Footer, Header, Static
 from api.app.models.commentfile import CommentFile
 from cli.api import PolychromeAPI
@@ -30,3 +31,8 @@ class CommentFileScreen(Screen):
             yield Static(post.content, id=f"comment-post-content-{i}", classes="comment-post-content")
             yield Static(post.author, id=f"comment-post-author-{i}", classes="comment-post-author")
         yield Footer()
+
+    def on_key(self, event: events.Key) -> None:
+        if event.key == "enter":
+            event.stop()
+            self.app.pop_screen()

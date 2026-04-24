@@ -24,6 +24,9 @@ run:
 cli:
 	uv run textual run cli.app:main --dev
 
+console:
+	uv run textual console
+
 migrate:
 	uv run alembic upgrade head
 

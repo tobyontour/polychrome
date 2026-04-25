@@ -15,6 +15,9 @@ fix:
 test: install-dev
 	uv run pytest
 
+update-test: install-dev
+	uv run pytest --snapshot-update
+
 coverage: install-dev
 	uv run pytest --cov=api api/tests
 

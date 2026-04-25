@@ -4,6 +4,7 @@ import secrets
 
 class User(BaseModel):
     username: str
+    nameline: str
     password: SecretStr
     email: str
     created_at: datetime = datetime.now()

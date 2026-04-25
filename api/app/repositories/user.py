@@ -1,6 +1,6 @@
 from ..models.user import User, SecretStr
 from sqlalchemy import Integer, String, DateTime
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import Mapped, mapped_column
 from datetime import datetime
 
@@ -37,6 +37,7 @@ class SqlUser(Base):
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     username: Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    nameline: Mapped[str] = mapped_column(String, nullable=False)
     password: Mapped[str] = mapped_column(String, nullable=False)
     email: Mapped[str] = mapped_column(String, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
@@ -45,6 +46,7 @@ class SqlUser(Base):
     def to_model(self) -> User:
         return User(
             username=self.username,
+            nameline=self.nameline,
             password=SecretStr(self.password),
             email=self.email,
             created_at=self.created_at,
@@ -52,6 +54,7 @@ class SqlUser(Base):
 
     def from_model(self, user: User) -> None:
         self.username = user.username
+        self.nameline = user.nameline
         self.password = user.password.get_secret_value()
         self.email = user.email
         self.created_at = user.created_at

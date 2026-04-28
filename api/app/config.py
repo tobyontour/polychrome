@@ -2,7 +2,7 @@ import os
 import secrets
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
-
+from .repositories import Base
 # Override in production via environment.
 SECRET_KEY = os.environ.get("JWT_SECRET_KEY", secrets.token_urlsafe(32))
 ALGORITHM = "HS256"
@@ -18,5 +18,7 @@ DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///users.db")
 
 engine = create_engine(DATABASE_URL)
 
-def get_session() -> Session:
-    return Session(bind=engine)
+def get_session(create_tables: bool = False) -> Session:
+    if create_tables:
+        Base.metadata.create_all(engine)
+    return Session(engine)

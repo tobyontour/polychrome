@@ -1,13 +1,16 @@
+import os
 from fastapi import APIRouter
 from fastapi import Depends, Form, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
+from datetime import datetime
 from .auth import get_current_user, verify_credentials, create_access_token
 from .login_tracker import login_tracker
 from .repositories.menu import FileSystemMenuRepository, MenuRepository
 from .models.menu import Menu
 from .repositories.commentfile import CommentRepository
 from .models.commentfile import CommentFile, Post
+from .repositories.user import UserRepository, SqlUserRepository
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/token")
 
@@ -30,7 +33,10 @@ def get_menu_repository() -> MenuRepository:
     return FileSystemMenuRepository(base_path="data/menus")
 
 def get_comment_repository() -> CommentRepository:
-    return CommentRepository()
+    return CommentRepository(os.environ.get("COMMENT_FILE_PATH", "data/commentfiles"))
+
+def get_user_repository() -> UserRepository:
+    return SqlUserRepository()
 
 @router.get("/api/me")
 async def api_me(username: str = Depends(get_current_user)) -> TokenData:
@@ -44,6 +50,19 @@ async def api_token(username: str = Form(...), password: str = Form(...)) -> Tok
     login_tracker.record_login(username, token)
     return Token(access_token=token, token_type="bearer")
 
+class UserInfo(BaseModel):
+    username: str
+    nameline: str
+    created_at: datetime
+    last_login: datetime | None = None
+    info_text: str | None = None
+
+@router.get("/api/user/{username}")
+async def api_user(username: str) -> UserInfo:
+    user = get_user_repository().get_user(username)
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    return UserInfo(username=user.username, nameline=user.nameline, created_at=user.created_at, last_login=user.last_login, info_text=user.info_text)
 
 @router.get("/api/logged-in-users")
 async def api_logged_in_users(_: str = Depends(get_current_user)) -> LoggedInUsers:

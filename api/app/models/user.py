@@ -1,14 +1,12 @@
 from pydantic import BaseModel, SecretStr
 from datetime import datetime
-import secrets
 
 class User(BaseModel):
     username: str
     nameline: str
-    password: SecretStr
+    password: SecretStr | None
     email: str
     created_at: datetime = datetime.now()
     updated_at: datetime | None = None
-
-    def validate_password(self, password: str) -> bool:
-        return secrets.compare_digest(self.password.get_secret_value(), password)
+    last_login: datetime | None = None
+    info_text: str | None = None

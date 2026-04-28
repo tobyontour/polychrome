@@ -31,7 +31,7 @@
       "keypath": "1",
       "title": "Menu 1",
       "owner": "toby",
-      "header": "Menu 1",
+      "header": "Menu 1 header",
       "access_groups": [],
       "items": [
         {

@@ -1,5 +1,4 @@
 from textual.app import ComposeResult
-from textual import on
 from textual.screen import Screen
 from textual.widgets import Button, Footer, Header, Static
 from textual.containers import Horizontal, Vertical
@@ -41,7 +40,7 @@ class MenuScreen(Screen):
         """Compose the screen."""
         assert self._menu is not None
         self.title = self._menu.title
-        self.id = self._menu.keypath
+        self.id = f"menu-{self._menu.keypath}" if self._menu.keypath != "_" else "menu--main"
         yield Header()
         yield Horizontal(
             Static(self._menu.title, id="menu-title"),

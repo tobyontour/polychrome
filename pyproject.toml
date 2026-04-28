@@ -14,6 +14,7 @@ dependencies = [
     "pwdlib[argon2]>=0.3.0",
     "httpx>=0.28.1",
     "textual>=8.2.2",
+    "argon2-cffi>=25.1.0",
 ]
 
 [dependency-groups]
@@ -32,3 +33,6 @@ pythonpath = ["."]
 
 [project.scripts]
 polychrome-cli = "cli.app:main"
+
+[tool.ruff]
+line-length = 120

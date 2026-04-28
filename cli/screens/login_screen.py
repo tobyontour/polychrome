@@ -33,6 +33,7 @@ class LoginScreen(Screen):
     ) -> None:
         super().__init__(name=name, id=id, classes=classes)
         self._api_url = api_url
+        self.title = "Login"
 
     def compose(self) -> ComposeResult:
         """Compose the screen."""

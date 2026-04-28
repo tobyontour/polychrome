@@ -4,11 +4,22 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from jose import jwt
-
+from datetime import datetime
 from api.app.api import router
 from api.app.auth import COOKIE_NAME
-from api.app.config import ALGORITHM, SECRET_KEY
+from api.app.config import ALGORITHM, SECRET_KEY, get_session
+from api.app.repositories.user import SqlUserRepository, SqlUser
 
+
+@pytest.fixture
+def user_repository() -> SqlUserRepository:
+    with get_session(create_tables=True) as session:
+        try:
+            session.add(SqlUser(username="testuser", nameline="Test User", password="testpassword", email="test@example.com", created_at=datetime.fromisoformat("2026-04-28T00:00:00")))
+            session.commit()
+        except Exception:
+            pass
+    return SqlUserRepository()
 
 @pytest.fixture
 def api_client() -> TestClient:
@@ -93,6 +104,16 @@ def test_me_accepts_access_token_cookie(api_client: TestClient) -> None:
     assert me.status_code == 200
     assert me.json() == {"username": "testuser"}
 
+
+def test_user_info(api_client: TestClient, user_repository: SqlUserRepository) -> None:
+    response = api_client.get("/api/user/testuser")
+    assert response.status_code == 200
+    assert response.json() == {"username": "testuser", "nameline": "Test User", "created_at": "2026-04-28T00:00:00", "last_login": None, "info_text": None}
+
+def test_user_info_not_found(api_client: TestClient) -> None:
+    response = api_client.get("/api/user/nonexistent")
+    assert response.status_code == 404
+    assert response.json() == {"detail": "User not found"}
 
 def test_logged_in_users_requires_authentication(api_client: TestClient) -> None:
     response = api_client.get("/api/logged-in-users")

@@ -9,7 +9,6 @@ from textual.app import App
 from cli import LoginResult
 from cli.api import PolychromeAPI
 from cli.screens import LoginScreen, MenuScreen
-from cli.tests.dummy_api import DummyAPI
 
 
 class PolychromeCLIApp(App[None]):
@@ -18,6 +17,7 @@ class PolychromeCLIApp(App[None]):
 
     BINDINGS = [("q", "quit", "Quit")]
     _api: PolychromeAPI | None = None
+
     async def on_mount(self) -> None:
         """Handle mount event."""
 
@@ -25,7 +25,7 @@ class PolychromeCLIApp(App[None]):
             async def check_logged_in(result: LoginResult | None) -> None:
                 if result:
                     self._api = PolychromeAPI(result.api_url, result.token)
-
+                    self._api.username = result.username
                     menu = await self._api.get_menu("_")
                     if menu is None:
                         raise ValueError("Menu not found")
@@ -45,7 +45,6 @@ class PolychromeCLIApp(App[None]):
 def main() -> None:
     """Run the Textual API login client."""
     app = PolychromeCLIApp()
-    app._api = DummyAPI(structure_dir="cli/tests/data")
     app.run()
 
 

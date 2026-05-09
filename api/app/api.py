@@ -57,6 +57,13 @@ class UserInfo(BaseModel):
     last_login: datetime | None = None
     info_text: str | None = None
 
+
+class PostCreate(BaseModel):
+    subject: str
+    content: str
+    from_line: str | None = None
+
+
 @router.get("/api/user/{username}")
 async def api_user(username: str) -> UserInfo:
     user = get_user_repository().get_user(username)
@@ -96,3 +103,33 @@ async def api_comment_file_posts(keypath: str, start_index: int = 0, length: int
     if comment is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Comment file not found")
     return list(comment.read(start_index, length))
+
+
+@router.post("/api/commentfile/{keypath}/posts")
+async def api_create_comment_file_post(
+    keypath: str,
+    payload: PostCreate,
+    username: str = Depends(get_current_user),
+    comment_repository: CommentRepository = Depends(get_comment_repository),
+) -> Post:
+    subject = payload.subject.strip()
+    content = payload.content.strip()
+    if not subject:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Subject cannot be empty")
+    if not content:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Content cannot be empty")
+
+    author = username
+    from_line = (payload.from_line or author).strip() or author
+    post = Post(
+        date=datetime.now(),
+        from_line=from_line,
+        subject=subject,
+        content=payload.content.strip(),
+        author=author,
+        index=0,
+    )
+    created_post = comment_repository.create_comment_post(keypath, post)
+    if created_post is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Comment file not found")
+    return created_post

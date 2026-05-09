@@ -1,6 +1,6 @@
 import os
 from datetime import datetime
-from api.app.models.commentfile import CommentFile
+from api.app.models.commentfile import CommentFile, Post
 from api.app.models.menu import Menu
 from api.app.repositories.commentfile import CommentRepository
 from api.app.repositories.menu import FileSystemMenuRepository
@@ -40,3 +40,28 @@ class DummyAPI(PolychromeAPI):
 
     async def get_comment_file(self, keypath: str) -> CommentFile | None:
         return self.comment_repository.get_comment_file(keypath)
+
+    async def create_comment_post(
+        self,
+        keypath: str,
+        *,
+        subject: str,
+        content: str,
+        from_line: str | None = None,
+    ) -> Post | None:
+        comment_file = self.comment_repository.get_comment_file(keypath)
+        if comment_file is None:
+            return None
+
+        author = self.username or "anonymous"
+        new_post = Post(
+            date=datetime.now(),
+            from_line=(from_line or author).strip() or author,
+            subject=subject.strip(),
+            content=content.strip(),
+            author=author,
+            index=0,
+        )
+        comment_file.append(new_post)
+        self.comment_repository.update_comment_file(comment_file)
+        return new_post

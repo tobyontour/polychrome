@@ -1,0 +1,18 @@
+{
+  "keypath": "3",
+  "name": "Item 3 comments",
+  "header": "Item 3 comment header",
+  "last_change": "2026-05-01T12:00:00Z",
+  "owner": "toby",
+  "access_groups": [],
+  "posts": [
+    {
+      "date": "2026-05-01T12:00:00Z",
+      "from_line": "Initial line",
+      "subject": "Welcome",
+      "content": "This is the first post.",
+      "author": "sysop",
+      "index": 0
+    }
+  ]
+}

@@ -2,7 +2,7 @@ from datetime import datetime
 
 import httpx
 
-from api.app.models.commentfile import CommentFile
+from api.app.models.commentfile import CommentFile, Post
 from api.app.models.menu import Menu
 
 
@@ -48,6 +48,28 @@ class PolychromeAPI:
             response = await self.client.get(f"/api/commentfile/{keypath}")
             response.raise_for_status()
             return CommentFile.model_validate(response.json())
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == 404:
+                return None
+            raise e
+
+    async def create_comment_post(
+        self,
+        keypath: str,
+        *,
+        subject: str,
+        content: str,
+        from_line: str | None = None,
+    ) -> Post | None:
+        payload = {
+            "subject": subject,
+            "content": content,
+            "from_line": from_line,
+        }
+        try:
+            response = await self.client.post(f"/api/commentfile/{keypath}/posts", json=payload)
+            response.raise_for_status()
+            return Post.model_validate(response.json())
         except httpx.HTTPStatusError as e:
             if e.response.status_code == 404:
                 return None

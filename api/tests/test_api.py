@@ -5,7 +5,8 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from jose import jwt
 from datetime import datetime
-from api.app.api import router
+from api.app.routers.api import router as api_router
+from api.app.routers.auth import router as auth_router
 from api.app.auth import COOKIE_NAME
 from api.app.config import ALGORITHM, SECRET_KEY, get_session
 from api.app.repositories.user import SqlUserRepository, SqlUser
@@ -24,7 +25,8 @@ def user_repository() -> SqlUserRepository:
 @pytest.fixture
 def api_client() -> TestClient:
     app = FastAPI()
-    app.include_router(router)
+    app.include_router(api_router)
+    app.include_router(auth_router)
     return TestClient(app)
 
 

@@ -1,6 +1,8 @@
 """Tests for JSON API routes in api.app.api."""
 
 import pytest
+import shutil
+from pathlib import Path
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from jose import jwt
@@ -151,3 +153,55 @@ def test_logged_in_users_deduplicates_multiple_tokens(api_client: TestClient) ->
     )
     assert response.status_code == 200
     assert response.json() == {"users": ["testuser"]}
+
+
+def test_create_comment_post(api_client: TestClient, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    fixture_commentfiles = tmp_path / "commentfiles"
+    shutil.copytree(Path("data/commentfiles"), fixture_commentfiles)
+    monkeypatch.setenv("COMMENT_FILE_PATH", str(fixture_commentfiles))
+
+    token_response = api_client.post(
+        "/api/token",
+        data={"username": "testuser", "password": "testpass"},
+    )
+    token = token_response.json()["access_token"]
+    response = api_client.post(
+        "/api/commentfile/2/posts",
+        headers={"Authorization": f"Bearer {token}"},
+        json={
+            "subject": "New API post",
+            "content": "Created by a test",
+            "from_line": "test-from",
+        },
+    )
+    assert response.status_code == 200
+    assert response.json()["subject"] == "New API post"
+    assert response.json()["content"] == "Created by a test"
+    assert response.json()["author"] == "testuser"
+    assert response.json()["from_line"] == "test-from"
+
+    posts_response = api_client.get(
+        "/api/commentfile/2/posts",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert posts_response.status_code == 200
+    posts = posts_response.json()
+    assert any(post["subject"] == "New API post" for post in posts)
+
+
+def test_create_comment_post_not_found(api_client: TestClient) -> None:
+    token_response = api_client.post(
+        "/api/token",
+        data={"username": "testuser", "password": "testpass"},
+    )
+    token = token_response.json()["access_token"]
+    response = api_client.post(
+        "/api/commentfile/does-not-exist/posts",
+        headers={"Authorization": f"Bearer {token}"},
+        json={
+            "subject": "New API post",
+            "content": "Created by a test",
+        },
+    )
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Comment file not found"

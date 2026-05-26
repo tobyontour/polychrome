@@ -1,4 +1,4 @@
-from ..models.commentfile import CommentFile
+from ..models.commentfile import CommentFile, Post
 import os
 import json
 
@@ -19,3 +19,11 @@ class CommentRepository:
     def update_comment_file(self, comment_file: CommentFile) -> None:
         with open(os.path.join(self.base_path, f"{comment_file.keypath}.json"), "w") as f:
             f.write(comment_file.model_dump_json())
+
+    def create_comment_post(self, keypath: str, post: Post) -> Post | None:
+        comment_file = self.get_comment_file(keypath)
+        if comment_file is None:
+            return None
+        comment_file.append(post)
+        self.update_comment_file(comment_file)
+        return comment_file.posts[-1]

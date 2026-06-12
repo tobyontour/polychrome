@@ -1,6 +1,6 @@
-Screen {
-  align: center top;
-}
+# Screen {
+#   align: center top;
+# }
 
 #form {
   width: 70;
@@ -55,4 +55,46 @@ Input {
     width: 40;
     margin: 0 0 1 8;
   }
+}
+
+
+MenuScreen {
+  align: center top;
+
+  #menu-title {
+    width: 80;
+    height: 1;
+    text-align: center;
+  }
+  #menu-header {
+    background: blue 50%;
+    width: 80;
+    height: 5;
+    border: wide white;
+  }
+
+  #menu-owner-container {
+    background: red 50%;
+    height: 1;
+    width: 80;
+  }
+  #menu-owner {
+    background: yellow 50%;
+  }
+
+  #menu-items-container {
+    background: green 50%;
+    width: 80;
+    content-align: center top;
+    margin: 1 0 1 0;
+    Button {
+      width: 100%;
+    }
+  }
+
+  #menu-footer-container {
+    background: purple 50%;
+    height: 1;
+  }
+
 }

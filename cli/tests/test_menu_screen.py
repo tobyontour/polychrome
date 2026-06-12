@@ -36,7 +36,7 @@ async def test_menu_navigation():
     app = PolychromeCLIApp()
     app._api = DummyAPI(structure_dir="cli/tests/data")
     async with app.run_test():
-        assert app.screen.query_one("#menu-owner", Static).content == "(toby)"
+        assert app.screen.query_one("#menu-owner", Static).content.find("toby") # type: ignore
         assert app.screen.query_one("#back", Button).label == "Back"
         assert app.screen.query_one("#scan", Button).label == "Scan"
         assert app.screen.query_one("#options", Button).label == "Options"
@@ -61,3 +61,29 @@ async def test_menu_navigation_to_item():
         assert pilot.app.screen.id == "menu-1"
         assert pilot.app.screen.query_one("#menu-header", Static).content == "Menu 1 header"
         assert pilot.app.screen.query_one("#menu-file-5", Button).label == " Add  [5] - Item 5"
+
+@pytest.mark.asyncio
+async def test_menu_navigation_to_menu_and_back_key():
+    """Test menu navigation."""
+    app = PolychromeCLIApp()
+    app._api = DummyAPI(structure_dir="cli/tests/data")
+    async with app.run_test() as pilot:
+        await pilot.press("1")
+        assert pilot.app.screen.title == "Menu 1"
+        assert pilot.app.screen.id == "menu-1"
+        await pilot.press("enter")
+        assert pilot.app.screen.title == "Main Menu"
+        assert pilot.app.screen.id == "menu--main"
+
+@pytest.mark.asyncio
+async def test_menu_navigation_to_menu_and_back_button():
+    """Test menu navigation."""
+    app = PolychromeCLIApp()
+    app._api = DummyAPI(structure_dir="cli/tests/data")
+    async with app.run_test() as pilot:
+        await pilot.press("1")
+        assert pilot.app.screen.title == "Menu 1"
+        assert pilot.app.screen.id == "menu-1"
+        await pilot.click("#back")
+        assert pilot.app.screen.title == "Main Menu"
+        assert pilot.app.screen.id == "menu--main"

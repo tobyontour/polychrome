@@ -9,6 +9,7 @@ from textual.app import App
 from cli import LoginResult
 from cli.api import PolychromeAPI
 from cli.screens import LoginScreen, MenuScreen
+from cli.tests.dummy_api import DummyAPI
 
 
 class PolychromeCLIApp(App[None]):
@@ -45,6 +46,7 @@ class PolychromeCLIApp(App[None]):
 def main() -> None:
     """Run the Textual API login client."""
     app = PolychromeCLIApp()
+    app._api = DummyAPI(structure_dir="cli/tests/data")
     app.run()
 
 

@@ -16,7 +16,7 @@
       "jinja": true
     },
     {
-      "name": "Python Debugger: Temp",
+      "name": "Python Debugger: CLI",
       "type": "debugpy",
       "request": "launch",
       "module": "cli",

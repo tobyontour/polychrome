@@ -3,6 +3,7 @@ from textual.screen import Screen
 from textual.widgets import Button, Footer, Header, Static
 from textual.containers import Horizontal, Vertical
 from textual import events
+from textual.binding import Binding
 from api.app.models.menu import Menu, MenuItem
 from cli.api import PolychromeAPI
 from cli.screens.commentfile_screen import CommentFileScreen
@@ -22,6 +23,18 @@ _HORIZONTAL_LINE_CHARS: dict[str, str] = {
 
 class MenuScreen(Screen):
     """Screen for the main application."""
+
+    BINDINGS = [
+        Binding(key="q", action="quit", description="Quit the app"),
+        Binding(
+            key="question_mark",
+            action="help",
+            description="Show help screen",
+            key_display="?",
+        ),
+        Binding(key="delete", action="delete", description="Delete the thing"),
+        Binding(key="j", action="down", description="Scroll down", show=False),
+    ]
 
     def __init__(
         self,

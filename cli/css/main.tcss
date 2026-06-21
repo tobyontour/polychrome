@@ -96,5 +96,31 @@ MenuScreen {
     background: purple 50%;
     height: 1;
   }
+}
 
+CommentFileScreen {
+  align: center top;
+
+  #comment-file-name {
+    width: 80;
+    height: 1;
+    text-align: center;
+  }
+  #comment-file-header {
+    background: blue 50%;
+    width: 80;
+    height: 5;
+    border: wide white;
+  }
+  .comment-post-date {
+    margin-top: 1;
+    background: green 50%;
+    width: 80;
+    height: 1;
+    text-align: right;
+  }
+  .comment-post-from-line {
+    width: 80;
+    height: 2;
+  }
 }

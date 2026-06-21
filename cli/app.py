@@ -5,7 +5,7 @@ from __future__ import annotations
 import sys
 
 from textual.app import App
-
+from textual.binding import Binding
 from cli import LoginResult
 from cli.api import PolychromeAPI
 from cli.screens import LoginScreen, MenuScreen
@@ -16,7 +16,7 @@ class PolychromeCLIApp(App[None]):
     TITLE = "Polychrome"
     CSS_PATH = "css/main.tcss"
 
-    BINDINGS = [("q", "quit", "Quit")]
+    BINDINGS = [Binding(key="escape", action="quit", description="Logout")]
     _api: PolychromeAPI | None = None
 
     async def on_mount(self) -> None:

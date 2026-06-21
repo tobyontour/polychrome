@@ -2,7 +2,7 @@ import pytest
 from cli.app import PolychromeCLIApp
 from cli.tests.dummy_api import DummyAPI
 from textual.widgets import Button, Static
-
+from cli.screens.commentfile_screen import CommentFileScreen
 # @pytest.mark.asyncio
 def test_menu_snapshot(snap_compare):
     """Test pressing keys has the desired result."""
@@ -61,6 +61,19 @@ async def test_menu_navigation_to_item():
         assert pilot.app.screen.id == "menu-1"
         assert pilot.app.screen.query_one("#menu-header", Static).content == "Menu 1 header"
         assert pilot.app.screen.query_one("#menu-file-5", Button).label == " Add  [5] - Item 5"
+
+@pytest.mark.asyncio
+async def test_menu_navigation_to_comment_file():
+    """Test menu navigation."""
+    app = PolychromeCLIApp()
+    app._api = DummyAPI(structure_dir="cli/tests/data")
+    async with app.run_test() as pilot:
+        await pilot.press("3")
+        assert isinstance(pilot.app.screen, CommentFileScreen)
+        assert pilot.app.screen.title == "Comment File 3"
+        assert pilot.app.screen.id == "comment-file-3"
+        assert pilot.app.screen.query_one("#comment-file-name", Static).content == "Comment File 3"
+        assert pilot.app.screen.query_one("#comment-file-header", Static).content == "This is the header of comment file 3"
 
 @pytest.mark.asyncio
 async def test_menu_navigation_to_menu_and_back_key():
